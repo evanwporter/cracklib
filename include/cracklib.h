@@ -21,32 +21,37 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+#ifndef CRACKLIB_H
+#define CRACKLIB_H
+
+#include <pthread.h>
 #define _GNU_SOURCE
 
-#include <stdio.h> //Standard headers
-#include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <pthread.h> //POSIX threads
-
-#include <stdint.h>
-
-char default_ABC[] = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-const char CMD_DETECT[] = "file -i -b -L %s"; //this command return what is the file mime type
-
-const char* TYPE[] = { "rar", "7z", "zip", "" }; //the last "" signing this is end of the list
-const char* MIME[] = { "application/x-rar", "application/octet-stream", "application/x-zip", "" };
-const char* CMD[] = { "unrar t -y -p%s %s 2>&1", "7z t -y -p%s %s 2>&1", "unzip -P%s -t %s 2>&1", "" };
 
 #define PWD_LEN 100
-#define SAVE_INTERVAL 10000  // Save after every 10,000 passwords
+#define SAVE_INTERVAL 10000
 
 typedef struct {
-    char ABC[128]; // Alphabet used for password generation
-    char password[PWD_LEN + 1];  // Current password attempt
-    char password_good[PWD_LEN + 1]; // Correct password if found
-    unsigned int curr_len; // Length of current password
-    long counter; // Number of tested passwords
-    int finished; // 1 if password found, 0 otherwise
+    char ABC[128];
+    char password[PWD_LEN + 1];
+    char password_good[PWD_LEN + 1];
+    unsigned int curr_len;
+    long counter;
+    int finished;
 } CrackStatus;
+
+extern char default_ABC[];
+extern char filename[255];
+extern char statname[259];
+extern int num_threads;
+extern pthread_mutex_t pwdMutex;
+extern pthread_mutex_t finishedMutex;
+
+void crack(const char* file, int threads);
+void save_status();
+int load_status();
+char* nextpass();
+void* crack_thread();
+void* status_thread();
+
+#endif
