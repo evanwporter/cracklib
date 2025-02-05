@@ -1,0 +1,45 @@
+name: Build C++ Project
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y g++
+
+      - name: Install dependencies (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          choco install -y visualstudio2022buildtools
+          choco install -y visualstudio2022-workload-vctools
+
+      - name: Compile (Linux)
+        if: runner.os == 'Linux'
+        run: g++ -o rarcrack src/main.cpp src/cracklib.cpp -Wall -Wextra -std=c++17
+
+      - name: Compile (Windows)
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          cl /EHsc /std:c++17 src/main.cpp src/cracklib.cpp /Fe:rarcrack.exe
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rarcrack-${{ matrix.os }}
+          path: rarcrack*  # Uploads the executable
