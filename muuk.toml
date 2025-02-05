@@ -1,0 +1,11 @@
+[package]
+name = "rarcrack"
+version = "0.0.3"
+
+[library.rarcrack]
+include = ['include']
+sources = ['src/rarcrack.c']
+
+[build.bin]
+dependencies = { "muuk" = "v0.0.3" }
+sources = ['src/main.c']
