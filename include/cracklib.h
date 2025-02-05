@@ -27,12 +27,9 @@
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <libxml/xmlmemory.h> //libxml2 headers
-#include <libxml/parser.h>
-#include <libxml/parserInternals.h>
-#include <libxml/tree.h>
-#include <libxml/threads.h>
-#include <pthread.h>	//POSIX threads
+#include <pthread.h> //POSIX threads
+
+#include <stdint.h>
 
 char default_ABC[] = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -43,3 +40,13 @@ const char* MIME[] = { "application/x-rar", "application/octet-stream", "applica
 const char* CMD[] = { "unrar t -y -p%s %s 2>&1", "7z t -y -p%s %s 2>&1", "unzip -P%s -t %s 2>&1", "" };
 
 #define PWD_LEN 100
+#define SAVE_INTERVAL 10000  // Save after every 10,000 passwords
+
+typedef struct {
+    char ABC[128]; // Alphabet used for password generation
+    char password[PWD_LEN + 1];  // Current password attempt
+    char password_good[PWD_LEN + 1]; // Correct password if found
+    unsigned int curr_len; // Length of current password
+    long counter; // Number of tested passwords
+    int finished; // 1 if password found, 0 otherwise
+} CrackStatus;
