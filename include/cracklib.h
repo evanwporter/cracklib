@@ -27,7 +27,6 @@
 #include <pthread.h>
 #define _GNU_SOURCE
 
-
 #define PWD_LEN 100
 #define SAVE_INTERVAL 10000
 
@@ -53,5 +52,6 @@ int load_status();
 char* nextpass();
 void* crack_thread();
 void* status_thread();
+void status_to_json(const char* file);
 
 #endif
