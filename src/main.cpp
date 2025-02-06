@@ -1,51 +1,48 @@
 #include "../include/cracklib.hpp"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <string>
+#include <iostream>
+#include <thread>
 
-void parse_args(int argc, char** argv, char* file, int* threads, int* json_output) {
-    if (argc < 2) {
-        printf("USAGE: rarcrack encrypted_archive.ext [--threads NUM] [--json]\n");
-        exit(1);
+int parse_arguments(int argc, char* argv[], std::string& rar_file, int& thread_count) {
+    if (argc < 2 || argc > 4) {
+        std::cerr << "Usage: " << argv[0] << " <RARFILE>.rar [--threads #]\n";
+        return 1;
     }
 
-    strcpy(file, argv[1]);
-    *threads = 2;
-    *json_output = 0;
+    rar_file = argv[1];
+    thread_count = std::thread::hardware_concurrency();  // Default
 
-    for (int i = 2; i < argc; i++) {
-        if (strcmp(argv[i], "--threads") == 0) {
-            if ((i + 1) < argc) {
-                *threads = atoi(argv[++i]);
-                if (*threads < 1) *threads = 1;
-                if (*threads > 12) *threads = 12;
+    if (argc == 4) {
+        std::string arg = argv[2];
+        if (arg == "--threads") {
+            try {
+                thread_count = std::stoi(argv[3]);
+                if (thread_count < 1) {
+                    throw std::invalid_argument("Thread count must be >= 1");
+                }
             }
-            else {
-                printf("ERROR: Missing parameter for --threads!\n");
-                exit(1);
+            catch (...) {
+                std::cerr << "Invalid thread count value.\n";
+                return 1;
             }
         }
-        else if (strcmp(argv[i], "--json") == 0) {
-            *json_output = 1;
+        else {
+            std::cerr << "Unknown option: " << arg << "\n";
+            return 1;
         }
     }
+
+    return 0;
 }
 
 int main(int argc, char* argv[]) {
-    char file[255];
-    int threads;
-    int json_output;
+    std::string rar_file;
+    int thread_count;
 
-    printf("RarCrack! Modified by Evan William Porter\n\n");
-
-    parse_args(argc, argv, file, &threads, &json_output);
-
-    if (json_output) {
-        status_to_json(file);
-    }
-    else {
-        crack(file, threads);
+    if (parse_arguments(argc, argv, rar_file, thread_count)) {
+        return 1;
     }
 
-    return EXIT_SUCCESS;
+    crack(rar_file, thread_count);
+    return 0;
 }
