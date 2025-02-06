@@ -88,7 +88,7 @@ void brute_force_thread(const std::string& rar_file, size_t thread_id, size_t to
 
     // Load progress if available
     if (load_progress(progress_file, password, length)) {
-        std::cout << "[THREAD " << thread_id << "] Resuming from: " << password << "\n";
+        std::cout << "[THREAD " << static_cast<int>(thread_id) << "] Resuming from: " << password << "\n";
     }
 
     std::string log_buffer;
