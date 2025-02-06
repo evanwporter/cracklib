@@ -1,1 +1,6 @@
 rarcrack
+build/
+logs/
+.ninja_log
+*.exe
+*.pdb

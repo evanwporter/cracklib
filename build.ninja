@@ -1,0 +1,28 @@
+# Auto-generated Ninja build file
+
+cxx = cl
+ar = lib
+linker = cl
+
+rule compile
+  command = $cxx /c $in /Fo$out $cflags
+  description = Compiling $in
+
+rule archive
+  command = $ar /OUT:$out $in
+  description = Archiving $out
+
+rule link
+  command = $linker $in /Fe$out $lflags $libraries
+  description = Linking $out
+
+build build/release/rarcrack/main.obj: compile src/main.cpp
+  cflags = /Iinclude /EHsc /std:c++20 /utf-8
+build build/release/cracklib/cracklib.obj: compile src/cracklib.cpp
+  cflags = /Iinclude /DDEBUG /Zi /EHsc /W4 /std:c++20 /utf-8
+build build/release/cracklib/cracklib.lib: archive build/release/cracklib/cracklib.obj
+build build/release/rarcrack/rarcrack.lib: archive build/release/rarcrack/main.obj
+
+build build/release/rarcrack/rarcrack.exe: link build/release/rarcrack/main.obj build/release/cracklib/cracklib.lib build/release/rarcrack/rarcrack.lib 
+  lflags =
+  libraries =build/release/cracklib/cracklib.lib build/release/rarcrack/rarcrack.lib 
