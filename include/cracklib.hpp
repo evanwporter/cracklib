@@ -3,15 +3,12 @@
 
 #include <iostream>
 #include <fstream>
-#include <vector>
-#include <string>
-#include <cstdlib>
-#include <sstream>
-#include <algorithm>
-#include <chrono>
 #include <thread>
+#include <vector>
+#include <atomic>
+#include <chrono>
 #include <cstring>
-#include <mutex>
+#include <string>
 
 void crack(const std::string& rar_file, int thread_count);
 
